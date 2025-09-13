@@ -5,33 +5,29 @@ import networkx as nx
 
 console = Console()
 
-def print_sentences(sentences: list, limit: int = 5) -> None:
+def print_sentences(sentences: list, limit: int = 3) -> None:
     """Print the first few sentences with rich formatting."""
-    console.print(Panel("Sentences extracted from the document", style="bold blue"))
+    console.print(Panel("📄 Document Preview", style="bold blue"))
     for i, sentence in enumerate(sentences[:limit], 1):
-        console.print(f"[bold cyan]Sentence {i}:[/bold cyan] {sentence.text}")
-        console.print()
+        console.print(f"[cyan]{i}.[/cyan] {sentence.text[:100]}{'...' if len(sentence.text) > 100 else ''}")
 
-def print_graph_summary(G: nx.Graph, all_entities: list, co_occurrence_pairs: list) -> None:
-    """Print a summary of the graph using rich."""
-    console.print(Panel("Graph Analysis Summary", style="bold magenta"))
-    console.print(f"[green]Total person entities found in text:[/green] {len(set(all_entities))}")
-    console.print(f"[green]Major entities in visualization:[/green] {G.number_of_nodes()}")
-    console.print(f"[green]Connections between major entities:[/green] {G.number_of_edges()}")
-    console.print(f"[green]Total co-occurrence pairs (all entities):[/green] {len(co_occurrence_pairs)}")
+def print_graph_summary(G: nx.Graph, sentences: list) -> None:
+    """Print a concise summary of the graph using rich."""
+    from src.entity_extractor import get_unique_entities
+    
+    # Calculate total entities from sentences
+    all_entities = []
+    for sentence in sentences:
+        unique_entities = get_unique_entities(sentence)
+        all_entities.extend(unique_entities)
+    
+    console.print(Panel("📊 Network Summary", style="bold magenta"))
+    console.print(f"[green]Nodes:[/green] {G.number_of_nodes()} | [green]Connections:[/green] {G.number_of_edges()} | [green]Density:[/green] {nx.density(G):.3f}")
 
     if G.number_of_nodes() > 0:
-        console.print(f"\n[yellow]Major entities with full connection counts:[/yellow]")
-        for node in G.nodes():
-            full_conn = G.nodes[node].get('full_connections', G.degree(node))
-            major_conn = G.degree(node)
-            console.print(f"  📊 {node}: {full_conn} total connections ({major_conn} to major entities)")
-
-        console.print(f"\n[yellow]Connections between major entities:[/yellow]")
-        for edge in G.edges(data=True):
-            entity_1, entity_2, data = edge
-            weight = data.get('weight', 1)
-            console.print(f"  {entity_1} ↔ {entity_2} (co-occurrences: {weight})")
+        # Show top 5 most connected entities
+        degrees = dict(G.degree())
+        top_nodes = sorted(degrees.items(), key=lambda x: x[1], reverse=True)[:5]
+        console.print(f"\n[yellow]Most connected:[/yellow] " + " | ".join([f"{node}: {degree}" for node, degree in top_nodes]))
     else:
-        console.print(f"\n[red]No major entities found for visualization.[/red]")
-        console.print(f"[yellow]Try lowering the minimum mentions threshold.[/yellow]")
+        console.print(f"\n[red]No major entities found. Try lowering --min-mentions.[/red]")

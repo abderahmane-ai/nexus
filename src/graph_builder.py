@@ -18,15 +18,14 @@ def get_major_entities(sentences: List[spacy.tokens.Span], min_mentions: int = 3
     major_entities = {entity for entity, count in entity_counts.items() if count >= min_mentions}
     
     print(f"\n🎭 Entity Analysis:")
-    print(f"   Total unique entities found: {len(entity_counts)}")
-    print(f"   Major entities (≥{min_mentions} mentions): {len(major_entities)}")
+    print(f"   Total entities: {len(entity_counts)} | Major entities (≥{min_mentions} mentions): {len(major_entities)}")
     
-    # Show all entities with their counts
+    # Show only top 10 entities
     sorted_entities = sorted(entity_counts.items(), key=lambda x: x[1], reverse=True)
-    print(f"   All entities by frequency:")
-    for entity, count in sorted_entities:
-        status = "📊 MAJOR" if entity in major_entities else "📝 minor"
-        print(f"     • {entity}: {count} mentions {status}")
+    print(f"   Top entities:")
+    for entity, count in sorted_entities[:10]:
+        status = "📊" if entity in major_entities else "📝"
+        print(f"     {status} {entity}: {count}")
     
     return major_entities
 

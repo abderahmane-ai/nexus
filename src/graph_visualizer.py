@@ -287,29 +287,11 @@ def save_interactive_html(fig: go.Figure, filename: str = "graph_visualization.h
     with open(filename, 'w', encoding='utf-8') as f:
         f.write(html_with_glass)
     
-    print(f"✨ Glass-effect interactive graph saved as {filename}")
+    print(f"✨ Saved: {filename}")
 
 def show_graph_stats(G: nx.Graph) -> None:
-    """Display interesting graph statistics."""
-    print(f"\n📊 Graph Statistics:")
-    print(f"   Nodes: {G.number_of_nodes()}")
-    print(f"   Edges: {G.number_of_edges()}")
-    print(f"   Density: {nx.density(G):.3f}")
-    
+    """Display concise graph statistics."""
     if G.number_of_nodes() > 0:
-        # Most connected nodes (by total connections including minor entities)
-        full_connections_dict = {node: G.nodes[node].get('full_connections', G.degree(node)) 
-                                for node in G.nodes()}
-        top_nodes_full = sorted(full_connections_dict.items(), key=lambda x: x[1], reverse=True)[:5]
-        
-        print(f"   Most connected entities (total connections):")
-        for node, full_conn in top_nodes_full:
-            major_conn = G.degree(node)
-            print(f"     • {node}: {full_conn} total ({major_conn} to major entities)")
-        
-        # Also show by major entity connections
         degrees = dict(G.degree())
-        top_nodes_major = sorted(degrees.items(), key=lambda x: x[1], reverse=True)[:5]
-        print(f"   Most connected entities (major entity connections only):")
-        for node, degree in top_nodes_major:
-            print(f"     • {node}: {degree} connections")
+        top_nodes = sorted(degrees.items(), key=lambda x: x[1], reverse=True)[:3]
+        print(f"🔗 Top connections: " + " | ".join([f"{node}: {degree}" for node, degree in top_nodes]))

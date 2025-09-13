@@ -6,7 +6,7 @@ from src.entity_extractor import get_unique_entities
 from src.graph_builder import build_graph_from_sentences
 from src.cli import print_sentences, print_graph_summary
 from src.graph_visualizer import create_interactive_graph, save_interactive_html, show_graph_stats
-from itertools import combinations
+
 
 # Suppress warnings
 warnings.filterwarnings("ignore", category=UserWarning)
@@ -33,29 +33,16 @@ def main() -> None:
     # Build graph from sentences (only major entities will be visualized)
     G = build_graph_from_sentences(sentences, min_mentions=min_mentions)
 
-    # Collect all entities and pairs for summary
-    all_entities = []
-    co_occurrence_pairs = []
-    for sentence in sentences:
-        unique_entities = get_unique_entities(sentence)
-        all_entities.extend(unique_entities)
-        if len(unique_entities) >= 2:
-            co_occurrence_pairs.extend(list(combinations(unique_entities, 2)))
-
     # Print graph summary
-    print_graph_summary(G, all_entities, co_occurrence_pairs)
+    print_graph_summary(G, sentences)
     
     # Create interactive visualizations
-    print("\n🎨 Creating interactive visualizations...")
-    
-    # Show graph statistics
+    print("\n🎨 Creating visualization...")
     show_graph_stats(G)
     
     # Create interactive graph
-    fig = create_interactive_graph(G, "Major Characters Network - Euthyphro")
+    fig = create_interactive_graph(G, "Major Characters Network")
     save_interactive_html(fig, "data/processed/major_characters.html")
-    
-    print("✨ Open the HTML file in your browser for interactive exploration!")
 
 if __name__ == "__main__":
     main()
