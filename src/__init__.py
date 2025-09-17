@@ -1,13 +1,15 @@
-"""
-Source package for the application.
-"""
+"""Text analysis and network visualization package."""
 
-from .cli import *
-from .entity_extractor import *
-from .file_reader import *
-from .graph_builder import *
-from .text_processor import *
+from .core import TextProcessor, EntityExtractor
+from .io import FileReader
+from .graph import GraphBuilder, GraphVisualizer
+from .interface import CLI
 
 __all__ = [
-    ""
+    "TextProcessor",
+    "EntityExtractor", 
+    "FileReader",
+    "GraphBuilder",
+    "GraphVisualizer",
+    "CLI"
 ]
